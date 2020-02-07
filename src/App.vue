@@ -6,11 +6,15 @@
           <h4 class="heading">
             Excel Tool
           </h4>
-           <b-button variant="success" class="b-button" v-b-modal.new-swap-shift-modal>Word List</b-button>
-
+          <b-button
+            variant="success"
+            class="b-button"
+            v-b-modal.new-swap-shift-modal
+            >Word List</b-button
+          >
         </div>
       </div>
-      
+
       <div class="row m-3">
         <div class="col-md-12">
           <!-- <div
@@ -22,33 +26,40 @@
           >
             Drop Here
           </div> -->
-  <div class="form-group">
-    <label for="excelFileInput">Select Excel File</label>
-    <input 
-    type="file" 
-    class="form-control-file" 
-    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" 
-    id="excelFileInput"  
-    @change="handleInputFile">
-  </div>
-        
+          <div class="form-group">
+            <label for="excelFileInput">Select Excel File</label>
+            <input
+              type="file"
+              ref="file"
+              class="form-control-file"
+              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              id="excelFileInput"
+              @change="handleInputFile"
+            />
+          </div>
         </div>
       </div>
-      <div class="row">
+      <div class="row" v-if="isActiveFile">
         <div class="col-md-12">
           <table
             class="table table-striped table-hover table-condensed table-responsive"
           >
             <thead>
               <tr>
-                <th v-for="(item, index) in headers" :key="index">{{ item }}</th>
+                <th v-for="(item, index) in headers" :key="index">
+                  {{ item }}
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in tickets" :key="index">
-                <td v-for="(key, index) in item" :key="index">
+                <td
+                  v-for="(key, index) in item"
+                  :key="index"
+                  :style="{ width: getColumnWidth(key) }"
+                >
                   <label v-html="parseKey(key)"> </label>
-                  <p>{{ item.key }} </p>
+                  <p>{{ item.key }}</p>
                 </td>
               </tr>
             </tbody>
@@ -58,47 +69,77 @@
       </div>
     </div>
 
-     <b-modal id="new-swap-shift-modal" title="Word List" @click="colorPickerActive=false">
-        <div class="d-block text-center" @click="colorPickerActive=false">
-            <div class="row" @click="colorPickerActive=false">
-              <div class="col">
-                Highlited Text Color     
-              </div>
-              <div class="col">
-              <span class="picked-color" :style="{backgroundColor: color.hex}" @click="$event.preventDefault();$event.stopPropagation(); colorPickerActive=!colorPickerActive"></span>
-             <Sketch  
-            v-model="color"
-            :presetColors="presetColors"
-            v-show="colorPickerActive"
+    <b-modal
+      id="new-swap-shift-modal"
+      title="Word List"
+      @click="colorPickerActive = false"
+    >
+      <div class="d-block text-center" @click="colorPickerActive = false">
+        <div class="row" @click="colorPickerActive = false">
+          <div class="col">
+            Highlited Text Color
+          </div>
+          <div class="col">
+            <span
+              class="picked-color"
+              :style="{ backgroundColor: color.hex }"
+              @click="
+                $event.preventDefault();
+                $event.stopPropagation();
+                colorPickerActive = !colorPickerActive;
+              "
+            ></span>
+            <Sketch
+              v-model="color"
+              :presetColors="presetColors"
+              v-show="colorPickerActive"
             />
+          </div>
+        </div>
+
+        <div class="container mt-4" @click="colorPickerActive = false">
+          <p>Add the words that you want to highlight</p>
+          <div
+            class="form-row mt-1"
+            v-for="(word, index) in highlightedWords"
+            :key="index"
+          >
+            <div class="input-group">
+              
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter word"
+                v-model.lazy="highlightedWords[index]"
+              />
+
+              <div class="input-group-append">
+                <button class="btn btn-sm btn-danger" type="button" @click="removeItem(index)">
+                 &times;
+                </button>
               </div>
             </div>
-           
+          </div>
 
-           <div class="container mt-4" @click="colorPickerActive=false">
-             <p>Add the words that you want to highlight</p>
-  <div class="form-row mt-1" v-for="(word, index) in highlightedWords" :key="index">
-  <input type="text" class="form-control" placeholder="Enter word" v-model="highlightedWords[index]">
-  </div>
-
-
-     <button type="button" class="btn btn-primary btn-block mt-2" @click="highlightedWords.push('')">Add more</button>
-           </div>
-
-
-        
+          <button
+            type="button"
+            class="btn btn-primary btn-block mt-2"
+            @click="highlightedWords.push('')"
+          >
+            Add more
+          </button>
         </div>
-      </b-modal>
- 
+      </div>
+    </b-modal>
   </div>
 </template>
 
 <script>
-import XLSX from 'xlsx';
-import { BModal } from 'bootstrap-vue'
-import { Sketch } from 'vue-color'
+import XLSX from "xlsx";
+import { BModal } from "bootstrap-vue";
+import { Sketch } from "vue-color";
 export default {
-  components:{
+  components: {
     BModal,
     Sketch
   },
@@ -106,20 +147,42 @@ export default {
     return {
       tickets: [{ name: "" }],
       headers: [""],
-      color:{  hex: '#FFFF00'},
+      color: { hex: "#FFFF00" },
       colorPickerActive: false,
-      presetColors:[ 
-    '#FFFF00', '#00ff00', '#00ff0055', 'rgb(201, 76, 76)', 'rgba(0,0,255,1)', 'hsl(89, 43%, 51%)', 'hsla(89, 43%, 51%, 0.6)'
-  ],
-      highlightedWords: ['Canada', "Carretera Low", "Enterprise"]
+      presetColors: [
+        "#FFFF00",
+        "#00ff00",
+        "#00ff0055",
+        "rgb(201, 76, 76)",
+        "rgba(0,0,255,1)",
+        "hsl(89, 43%, 51%)",
+        "hsla(89, 43%, 51%, 0.6)"
+      ],
+      highlightedWords: [
+        "box",
+        "cable",
+        "wifi",
+        "channel",
+        "internet",
+        "test",
+        "fios"
+      ],
+      isActiveFile: false
     };
   },
   methods: {
-    parseKey(cell){
-      let modifiedCell = cell;
-      if(this.highlightedWords.includes(cell.toString())){
-        modifiedCell = `<span class="highlighted-text" style="background-color: ${this.color.hex}">${cell}<span>`
-      }
+    parseKey(cell) {
+      let modifiedCell = cell.toString();
+
+      this.highlightedWords.forEach(word => {
+        if (word != "" && word.length > 0) {
+          if (modifiedCell.search(word) != -1) {
+            let modifiedWord = `<span class="highlighted-text" style="background-color: ${this.color.hex}">${word}</span>`;
+            modifiedCell = this.replaceAll(modifiedCell, word, modifiedWord);
+          }
+        }
+      });
+
       return modifiedCell;
     },
     get_header_row(sheet) {
@@ -134,7 +197,7 @@ export default {
             XLSX.utils.encode_cell({ c: C, r: R })
           ]; /* find the cell in the first row */
         var hdr = "UNKNOWN " + C; // <-- replace with your desired default
-        if (cell && cell.t) hdr = XLSX.utils.format_cell(cell); 
+        if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
         headers.push(hdr);
       }
       return headers;
@@ -170,10 +233,11 @@ export default {
       var file = e.dataTransfer.files[0];
       this.handleFile(file);
     },
-    handleInputFile(e){
+    handleInputFile(e) {
       e.stopPropagation();
       e.preventDefault();
-  var file = e.target.files[0];
+
+      var file = e.target.files[0];
       this.handleFile(file);
     },
     handleDragover(e) {
@@ -181,37 +245,45 @@ export default {
       e.preventDefault();
       e.dataTransfer.dropEffect = "copy";
     },
-    handleFile(file){
-
-       var reader = new FileReader(),
-          name = file.name;
-        reader.onload = (e)=> {
-          var state = this;
-          var results,
-            data = e.target.result,
-            fixedData = this.fixdata(data),
-            workbook = XLSX.read(btoa(fixedData), { type: "base64" }),
-            firstSheetName = workbook.SheetNames[0],
-            worksheet = workbook.Sheets[firstSheetName];
-
-          state.headers = this.get_header_row(worksheet);
-
-          results = XLSX.utils.sheet_to_json(worksheet);
-          
-          state.tickets = results;
-       
-         
-        };
-        reader.readAsArrayBuffer(file);
-    }, 
+    handleFile(file) {
+      this.isActiveFile = true;
+      var reader = new FileReader(),
+        name = file.name;
+      reader.onload = e => {
+        var state = this;
+        var results,
+          data = e.target.result,
+          fixedData = this.fixdata(data),
+          workbook = XLSX.read(btoa(fixedData), { type: "base64" }),
+          firstSheetName = workbook.SheetNames[0],
+          worksheet = workbook.Sheets[firstSheetName];
+        state.headers = this.get_header_row(worksheet);
+        results = XLSX.utils.sheet_to_json(worksheet);
+        state.tickets = results;
+      };
+      reader.readAsArrayBuffer(file);
+    },
     performClick() {
-    var elem = this.$refs.file;
-    if(elem && document.createEvent) {
-      var evt = document.createEvent("MouseEvents");
-      evt.initEvent("click", true, false);
-      elem.dispatchEvent(evt);
-   }
-}
+      var elem = this.$refs.file;
+      if (elem && document.createEvent) {
+        var evt = document.createEvent("MouseEvents");
+        evt.initEvent("click", true, false);
+        elem.dispatchEvent(evt);
+      }
+    },
+    replaceAll(str, find, replace) {
+      return str.toString().replace(new RegExp(find, "g"), replace);
+    },
+    getColumnWidth(text) {
+      if (text.length > 10) {
+        return "590px";
+      } else {
+        return "100px";
+      }
+    },
+    removeItem(index){
+      this.highlightedWords.splice(index,1);
+    }
   }
 };
 </script>
@@ -227,23 +299,22 @@ export default {
   font: 20pt bold, "Vollkorn";
   color: #bbb;
 }
-.heading{
+.heading {
   display: inline-block;
 }
-.b-button{
+.b-button {
   float: right;
 }
-.picked-color{
+.picked-color {
   display: inline-block;
   width: 30px;
   height: 30px;
 }
 .vc-sketch {
-    position: absolute !important;
-    z-index: 9999;
+  position: absolute !important;
+  z-index: 9999;
 }
-.highlighted-text{
+.highlighted-text {
   padding: 4px;
 }
-
 </style>
