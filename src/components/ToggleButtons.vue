@@ -47,7 +47,7 @@ export default {
 
   watch: {
     mActiveGroup() {
-        console.log("activeGroup is changed")
+       
       this.$emit("group", this.mActiveGroup);
     }
   }
