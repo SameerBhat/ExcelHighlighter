@@ -1,19 +1,27 @@
 <template>
   <div id="app">
     <div class="container-responsive">
-      <div class="row bg-primary p-3">
+      <!-- header starts -->
+
+      <!-- bg-success -> green bg-primary -> blue { bg-secondar bg-dark bg-error} -->
+      <div class="row bg-success p-3">
         <div class="col-md-12">
-          <h4 class="heading">
+          <!-- text-dark, text-primary, secondary ... -->
+          <h4 class="heading text-white">
             Excel Tool
           </h4>
+
+          <!-- variant = success, danger -->
           <b-button
-            variant="success"
+            variant="danger"
             class="b-button"
             v-b-modal.new-swap-shift-modal
             >Word List</b-button
           >
         </div>
       </div>
+
+      <!-- header ends -->
 
       <div class="row m-3">
         <div class="col-md-12">
@@ -26,8 +34,11 @@
           >
             Drop Here
           </div> -->
+
           <div class="form-group">
             <label for="excelFileInput">Select Excel File</label>
+
+            <!-- @change exexute handleInputFile() -->
             <input
               type="file"
               ref="file"
@@ -63,10 +74,20 @@
                 </td>
               </tr>
             </tbody>
-            <tfoot></tfoot>
+            <tfoot>
+             
+            </tfoot>
           </table>
         </div>
       </div>
+
+
+       <ToggleButtons
+       :activeGroup="activeGroup"
+       class="sticky"
+       @group="changeToggleActiveGroup"
+        :key="toggleButtonComponentKey"
+       />
     </div>
 
     <b-modal
@@ -99,23 +120,32 @@
 
         <div class="container mt-4" @click="colorPickerActive = false">
           <p>Add the words that you want to highlight</p>
+
+       <ToggleButtons
+       :activeGroup="activeGroup"
+       @group="changeToggleActiveGroup"
+      
+       />
+
           <div
             class="form-row mt-1"
-            v-for="(word, index) in highlightedWords"
-            :key="index"
-          >
+            v-for="(word, index) in highlightedWords[activeGroup]"
+            :key="index">
             <div class="input-group">
-              
               <input
                 type="text"
                 class="form-control"
                 placeholder="Enter word"
-                v-model.lazy="highlightedWords[index]"
+                v-model.lazy="highlightedWords[activeGroup][index]"
               />
 
               <div class="input-group-append">
-                <button class="btn btn-sm btn-danger" type="button" @click="removeItem(index)">
-                 &times;
+                <button
+                  class="btn btn-sm btn-danger"
+                  type="button"
+                  @click="removeItem(index)"
+                >
+                  &times;
                 </button>
               </div>
             </div>
@@ -138,16 +168,19 @@
 import XLSX from "xlsx";
 import { BModal } from "bootstrap-vue";
 import { Sketch } from "vue-color";
+
+import ToggleButtons from "./components/ToggleButtons"
 export default {
   components: {
     BModal,
-    Sketch
+    Sketch,
+    ToggleButtons
   },
   data() {
     return {
       tickets: [{ name: "" }],
       headers: [""],
-      color: { hex: "#FFFF00" },
+      color: { hex: "#00ff00" },
       colorPickerActive: false,
       presetColors: [
         "#FFFF00",
@@ -158,23 +191,82 @@ export default {
         "hsl(89, 43%, 51%)",
         "hsla(89, 43%, 51%, 0.6)"
       ],
-      highlightedWords: [
-        "box",
-        "cable",
-        "wifi",
-        "channel",
-        "internet",
-        "test",
-        "fios"
-      ],
-      isActiveFile: false
+      activeGroup: "group1",
+      highlightedWords: {
+        group1: [
+          "box",
+          "cable",
+          "wifi",
+          "channel",
+          "internet",
+          "test",
+          "fios",
+          "email",
+          "phone",
+          "line",
+          "router",
+          "adapter",
+          "disconnect",
+          "speed",
+          "account",
+          "pixel",
+          "signal",
+          "tv",
+          "network",
+          "connect",
+          "flash",
+          "computer",
+          "laptop",
+          "ipad",
+          "wire",
+          "ticket",
+          "service",
+          "power",
+          "supply",
+          "battery",
+          "television",
+          "hate",
+          "streaming",
+          "watch",
+          "triple play",
+          "package",
+          "hbo"
+        ],
+        group2: [
+          "order",
+          "purchase",
+          "discount",
+          "free",
+          "credit",
+          "call back",
+          "setting",
+          "schedule",
+          "installation",
+          "technician",
+          "reset",
+          "ship",
+          "on hold"
+        ],
+        group3: [
+          "bullshit",
+          "issue",
+          "problem",
+          "frustrat",
+          "wors",
+          "unfortunate",
+          "discontinue",
+          "want"
+        ]
+      },
+      isActiveFile: false,
+      toggleButtonComponentKey: 9868
     };
   },
   methods: {
     parseKey(cell) {
       let modifiedCell = cell.toString();
 
-      this.highlightedWords.forEach(word => {
+      this.highlightedWords[this.activeGroup].forEach(word => {
         if (word != "" && word.length > 0) {
           if (modifiedCell.search(word) != -1) {
             let modifiedWord = `<span class="highlighted-text" style="background-color: ${this.color.hex}">${word}</span>`;
@@ -238,6 +330,7 @@ export default {
       e.preventDefault();
 
       var file = e.target.files[0];
+
       this.handleFile(file);
     },
     handleDragover(e) {
@@ -281,8 +374,15 @@ export default {
         return "100px";
       }
     },
-    removeItem(index){
-      this.highlightedWords.splice(index,1);
+    removeItem(index) {
+      this.highlightedWords.splice(index, 1);
+    },
+    changeToggleActiveGroup(activeGroup){
+      this.activeGroup = activeGroup;
+      this.forceRerender();
+    },
+    forceRerender() {
+      this.toggleButtonComponentKey += 1;  
     }
   }
 };
@@ -315,6 +415,11 @@ export default {
   z-index: 9999;
 }
 .highlighted-text {
-  padding: 4px;
+  padding: 0px;
+}
+.sticky {
+  position: fixed !important;
+  right: 20px;
+  bottom: 0px;
 }
 </style>
