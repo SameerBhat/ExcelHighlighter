@@ -9,7 +9,7 @@
         autocomplete="off"
         v-model="mActiveGroup"
       />
-      Group1
+      TechTerms
     </label>
     <label class="btn btn-danger" :class="{ active: mActiveGroup == 'group2' }">
       <input
@@ -20,7 +20,7 @@
         autocomplete="off"
         v-model="mActiveGroup"
       />
-      Group2
+      Service
     </label>
     <label class="btn btn-danger" :class="{ active: mActiveGroup == 'group3' }">
       <input
@@ -31,7 +31,19 @@
         autocomplete="off"
         v-model="mActiveGroup"
       />
-      Group3
+      Problems
+    </label>
+
+    <label class="btn btn-danger" :class="{ active: mActiveGroup == 'all' }">
+      <input
+        type="radio"
+        name="options"
+        value="all"
+        id="option4"
+        autocomplete="off"
+        v-model="mActiveGroup"
+      />
+      All
     </label>
   </div>
 </template>

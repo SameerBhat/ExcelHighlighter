@@ -8,7 +8,7 @@
         <div class="col-md-12">
           <!-- text-dark, text-primary, secondary ... -->
           <h4 class="heading text-white">
-           NAUTILUS FIOS Summary Utility
+            NAUTILUS FIOS Summary Utility
           </h4>
 
           <!-- variant = success, danger -->
@@ -74,20 +74,17 @@
                 </td>
               </tr>
             </tbody>
-            <tfoot>
-             
-            </tfoot>
+            <tfoot></tfoot>
           </table>
         </div>
       </div>
 
-
-       <ToggleButtons
-       :activeGroup="activeGroup"
-       class="sticky"
-       @group="changeToggleActiveGroup"
+      <ToggleButtons
+        :activeGroup="activeGroup"
+        class="sticky"
+        @group="changeToggleActiveGroup"
         :key="toggleButtonComponentKey"
-       />
+      />
     </div>
 
     <b-modal
@@ -121,16 +118,16 @@
         <div class="container mt-4" @click="colorPickerActive = false">
           <p>Add the words that you want to highlight</p>
 
-       <ToggleButtons
-       :activeGroup="activeGroup"
-       @group="changeToggleActiveGroup"
-      
-       />
+          <ToggleButtons
+            :activeGroup="activeGroup"
+            @group="changeToggleActiveGroup"
+          />
 
           <div
             class="form-row mt-1"
             v-for="(word, index) in highlightedWords[activeGroup]"
-            :key="index">
+            :key="index"
+          >
             <div class="input-group">
               <input
                 type="text"
@@ -169,7 +166,7 @@ import XLSX from "xlsx";
 import { BModal } from "bootstrap-vue";
 import { Sketch } from "vue-color";
 
-import ToggleButtons from "./components/ToggleButtons"
+import ToggleButtons from "./components/ToggleButtons";
 export default {
   components: {
     BModal,
@@ -248,6 +245,66 @@ export default {
           "on hold"
         ],
         group3: [
+          "bullshit",
+          "issue",
+          "problem",
+          "frustrat",
+          "wors",
+          "unfortunate",
+          "discontinue",
+          "want"
+        ],
+        all: [
+          "box",
+          "cable",
+          "wifi",
+          "channel",
+          "internet",
+          "test",
+          "fios",
+          "email",
+          "phone",
+          "line",
+          "router",
+          "adapter",
+          "disconnect",
+          "speed",
+          "account",
+          "pixel",
+          "signal",
+          "tv",
+          "network",
+          "connect",
+          "flash",
+          "computer",
+          "laptop",
+          "ipad",
+          "wire",
+          "ticket",
+          "service",
+          "power",
+          "supply",
+          "battery",
+          "television",
+          "hate",
+          "streaming",
+          "watch",
+          "triple play",
+          "package",
+          "hbo",
+          "order",
+          "purchase",
+          "discount",
+          "free",
+          "credit",
+          "call back",
+          "setting",
+          "schedule",
+          "installation",
+          "technician",
+          "reset",
+          "ship",
+          "on hold",
           "bullshit",
           "issue",
           "problem",
@@ -377,12 +434,12 @@ export default {
     removeItem(index) {
       this.highlightedWords.splice(index, 1);
     },
-    changeToggleActiveGroup(activeGroup){
+    changeToggleActiveGroup(activeGroup) {
       this.activeGroup = activeGroup;
       this.forceRerender();
     },
     forceRerender() {
-      this.toggleButtonComponentKey += 1;  
+      this.toggleButtonComponentKey += 1;
     }
   }
 };
