@@ -1,19 +1,77 @@
 <template>
   <div id="app">
+<!-- BASIC INFO ABOUT HOW VUE WORKS -- IMPORTANT TO UNDERSTAND BEFORE KNOWING HOW THIS TOOL WORKS
+
+Every .vue file is divided into three parts:
+  1) template -> whatever is enclosed between <template></template>
+  2) scripts -> whatever is enclosed between <script></script>
+  3) style -> whatever is enclosed between <style></style>
+
+  #1) Templates i) inside template part you can only write pure html, however with the help of vue, you can additionally put dynamic variables and methods
+                  For example, you can use @click on any html tag to attach a click listner to that element and when you specify @click="someMethod()", it means that when that element is clicked
+                  someMethod() function will be executed. these methods are defined inside scripts tag under methods:{ ... }   section} 
+                   basically whenever you use @ infront, it means you are calling an action, actions in html can be @click, @change, @keyup @keydown etc
+
+                ii) also inside templates you can use variables which are defined inside scripts under  data(){ ... } section
+                  you can simply output the variable inside the template by enclosing variable name in double flower brackets e.g {{ variableName }}
+                  
+
+                iii) Moreover you can use methods to return variables like someMethod(){ return someVariable; }  and use {{ someMethod() }} to print the variable in html  indirectly 
+                 
+                 
+                 iv) I also have used v-model="variableName" , what it does is it binds the <input> element to the variable named variableName, its a two way binding which means whenever
+                      a variable changes, value in input changes, and vice versa. you dont need to write extra code like attach @change="someMethod" to input, then extract what value input has and then assign that value to variable, v-model does all that stuff iteslf... 
+            
+              
+                v) you can attach dynamic attributes with dynamic values with : (colon symbol) eg
+                  if this is the link tag <a href="google.com">Click Here </a> .... you can make href attribute dynamic
+                  by using it like <a :href="someVariable">Click Here </a>  .. similarily
+                   image tag -----   <img src="url/of/some/photo"/> can be  <img :src="someVariable"/>
+
+                  You can make any attribute of html dynamic by attaching the : (in front of it)
+
+                  so with @ and : you can attach listners and binders respectively
+                  sometimes instaed of @ you can use v-on
+                  and instead of : you can use v-bind   
+
+
+
+                vi) if you want to execute for loop on element, you can use v-for="statement"
+                for example if you have an array like this in data(){ fruits: ["apple", "mango", "orange " .. ]}
+
+                you can use it like this in html <span v-for="fruit in fruits"> {{fruit}}</span>
+                <span> will be executed n times and prints name of the value in the array, where  n is the length of array
+                similarily you can use v-for in any tag like <h3 v-for="fruit in fruits">{{fruit}}</h3>
+                fruits is the name of array, and fruit is the name of single entity of array, it can be named anything as long as you are using same name to echo inside same tag like we are using {{fruit}}
+                
+                vi) and lastly if you want to show/hide any element based on condition, you can use v-if="someVariable", someVariable should return boolean, true of false, based on which it is decided wether element is visible or not 
+                eg <span v-if="someVariable == 'apple'">  </span>, this span will only be displayed if someVariable value is apple
+
+
+
+              Additional info... not necessary to understand
+
+              viii) binding style and classes are little different  in vue
+              normally in html style is like this style="padding: 0px; margin: 8px" but in vue if you want to make it dynamic, you have to use :style="{padding: '0px', margin: '8px'}"
+              and normally in html class is like this class="class-name" but in vue if you want to make it dynamic, you have to use :class="{class-name: boolean}" if boolean is true, then only it is attached, otherwise dropped
+              so style & class uses javascript object as argument not strings, with different syntax for both
+
+     -->
     <div class="container-responsive">
       <!-- header starts -->
 
-      <!-- bg-success -> green bg-primary -> blue { bg-secondar bg-dark bg-error} -->
+     
       <div class="row bg-success p-3">
+
         <div class="col-md-12">
-          <!-- text-dark, text-primary, secondary ... -->
-          <h4 class="heading text-white">
+         
+          <h4 class="heading text-white">  <!-- thesec classes changes background of heading text "text-dark", "text-primary", "text-secondary"  etc... -->
             NAUTILUS FIOS Summary Utility
           </h4>
 
-          <!-- variant = success, danger -->
+          <!-- button variant can be = "success" ->(green), "danger"-> (red) -->
           <b-button
-            variant="danger"
+            variant="danger" 
             class="b-button"
             v-b-modal.new-swap-shift-modal
             >Word List</b-button
@@ -25,6 +83,8 @@
 
       <div class="row m-3">
         <div class="col-md-12">
+
+
           <!-- <div
             id="drop"
             @click="performClick"
@@ -38,39 +98,42 @@
           <div class="form-group">
             <label for="excelFileInput">Select Excel File</label>
 
-            <!-- @change exexute handleInputFile() -->
+          
             <input
               type="file"
               ref="file"
               class="form-control-file"
               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
               id="excelFileInput"
-              @change="handleInputFile"
-            />
+              @change="handleInputFile"/>   <!-- @change executes handleInputFile() method in scrpits methods section -->
+
           </div>
         </div>
       </div>
-      <div class="row" v-if="isActiveFile">
+      <div class="row" v-if="isActiveFile"> <!-- here I have used v-if to bind it to isActiveFile variable,  isActiveFile tracks if file is active or not, which simple shows or hides this element which is the table element container !-->
         <div class="col-md-12">
           <table
             class="table table-striped table-hover table-condensed table-responsive"
           >
             <thead>
               <tr>
-                <th v-for="(item, index) in headers" :key="index">
-                  {{ item }}
+                <th v-for="(header, index) in headers" :key="index">   <!-- Here I am using v-for loop to generate <th> </th> element ("table head element") n number of times, where n is the length of the headers array, I am storing the column names inside headers array, so this tag displays that at top of table using table head tag, you can also ignore :key everywhere in v-for loop tag because, its just a small convention !-->
+                  {{ header }}
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in tickets" :key="index">
-                <td
-                  v-for="(key, index) in item"
-                  :key="index"
-                  :style="{ width: getColumnWidth(key) }"
-                >
-                  <label v-html="parseKey(key)"> </label>
-                  <p>{{ item.key }}</p>
+              <tr v-for="(row, index) in tickets" :key="index"> <!-- here I am looping through the tickets array, which is array of rows of excel file,  so it generates tr (table row) element n no of times  !-->
+
+
+                <td v-for="(cell, index) in row" :key="index" :style="{ width: getColumnWidth(cell) }" >   <!--Inside each table row (tr), we have to display table cell denoted by td (table data), in html.. so we loop through row, which is extracted in turn from parent loop tickets....  each row has cell which contains data...   !-->
+
+                  <label v-html="parseKey(cell)"> </label>  <!-- This just displays the cell content, but the reason i am using parseKey method is because, I want to highlight some words in it, so parseKey method modifies the cell variable, replaces all matching words in it with backrground color of what is defined in color.hex variable indside data in scripts !-->
+
+
+                  <p>{{ row.key }}</p> <!--  Ignore it , it displays nothing!-->
+
+
                 </td>
               </tr>
             </tbody>
@@ -79,19 +142,26 @@
         </div>
       </div>
 
+<!-- this is the component for the buttons that you see on bottom left, toggle buttons -->
+<!-- start -->
       <ToggleButtons
         :activeGroup="activeGroup"
         class="sticky"
         @group="changeToggleActiveGroup"
-        :key="toggleButtonComponentKey"
-      />
+        :key="toggleButtonComponentKey"/>
+        <!-- end -->
+
+
+
     </div>
 
+
+<!-- this is the popup modal code  (tag named "b-modal"), it starts from here -->
+<!-- when you click on the word list, the popup that comes, is the one because of this code  -->
     <b-modal
       id="new-swap-shift-modal"
       title="Word List"
-      @click="colorPickerActive = false"
-    >
+      @click="colorPickerActive = false">
       <div class="d-block text-center" @click="colorPickerActive = false">
         <div class="row" @click="colorPickerActive = false">
           <div class="col">
@@ -158,6 +228,8 @@
         </div>
       </div>
     </b-modal>
+
+    <!-- modal ends here -->
   </div>
 </template>
 
